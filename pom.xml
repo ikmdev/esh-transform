@@ -1,0 +1,213 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>dev.ikm.build</groupId>
+		<artifactId>java-parent</artifactId>
+		<version>1.64.0</version>
+	</parent>
+
+	<groupId>dev.ikm.ike</groupId>
+	<artifactId>esh-transform</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>Event Set Hierarchy Transformation</name>
+	<organization>
+		<name>Integrated Knowledge Management</name>
+		<url>http://www.ikm.dev</url>
+	</organization>
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+			<comments>A business-friendly OSS license</comments>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<id>ikmdev</id>
+			<name>IKM Development Team</name>
+			<email>support@ikm.dev</email>
+		</developer>
+	</developers>
+
+	<scm>
+		<url>https://github.com/ikmdev/cosmos</url>
+	</scm>
+	<issueManagement>
+		<system>GitHub</system>
+		<url>https://github.com/ikmdev/tinkar-core/issues</url>
+	</issueManagement>
+
+	<properties>
+		<!-- Tinkar Properties -->
+		<tinkar-core.groupId>dev.ikm.tinkar</tinkar-core.groupId>
+		<tinkar-core.version>1.125.0</tinkar-core.version>
+		<tinkar-starter-data.version>20250729</tinkar-starter-data.version>
+		<tinkar-composer.version>1.12.0</tinkar-composer.version>
+
+		<!-- JPMS Properties -->
+		<tinkar-jpms-deps.groupId>dev.ikm.jpms</tinkar-jpms-deps.groupId>
+		<eclipse-collections-api.version>12.0.0.M3-r3</eclipse-collections-api.version>
+		<protobuf-java.version>4.30.2-r2</protobuf-java.version>
+
+		<!-- Misc -->
+		<lucene-core.version>9.12.1</lucene-core.version>
+		<commons-csv.version>1.14.1</commons-csv.version>
+
+		<!-- Maven Properties -->
+		<skipITs>true</skipITs>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- Core Libraries -->
+			<dependency>
+				<groupId>${tinkar-core.groupId}</groupId>
+				<artifactId>data-ephemeral-provider</artifactId>
+				<version>${tinkar-core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${tinkar-core.groupId}</groupId>
+				<artifactId>data-spinedarray-provider</artifactId>
+				<version>${tinkar-core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${tinkar-core.groupId}</groupId>
+				<artifactId>entity-provider</artifactId>
+				<version>${tinkar-core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${tinkar-core.groupId}</groupId>
+				<artifactId>executor-provider</artifactId>
+				<version>${tinkar-core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${tinkar-core.groupId}</groupId>
+				<artifactId>search-provider</artifactId>
+				<version>${tinkar-core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${tinkar-core.groupId}</groupId>
+				<artifactId>terms</artifactId>
+				<version>${tinkar-core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.ikm.tinkar</groupId>
+				<artifactId>composer</artifactId>
+				<version>${tinkar-composer.version}</version>
+			</dependency>
+
+			<!-- JPMS Libraries -->
+			<dependency>
+				<groupId>${tinkar-jpms-deps.groupId}</groupId>
+				<artifactId>eclipse-collections-api</artifactId>
+				<version>${eclipse-collections-api.version}</version>
+			</dependency>
+
+			<!-- Misc. -->
+			<dependency>
+				<groupId>org.apache.lucene</groupId>
+				<artifactId>lucene-core</artifactId>
+				<version>${lucene-core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-csv</artifactId>
+				<version>${commons-csv.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<!-- IKE Libraries -->
+		<dependency>
+			<groupId>${tinkar-core.groupId}</groupId>
+			<artifactId>data-ephemeral-provider</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>${tinkar-core.groupId}</groupId>
+			<artifactId>data-spinedarray-provider</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>${tinkar-core.groupId}</groupId>
+			<artifactId>entity-provider</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>${tinkar-core.groupId}</groupId>
+			<artifactId>executor-provider</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>${tinkar-core.groupId}</groupId>
+			<artifactId>search-provider</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>dev.ikm.tinkar</groupId>
+			<artifactId>composer</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>dev.ikm.tinkar.ext.owl</groupId>
+			<artifactId>owl-extension</artifactId>
+			<version>${tinkar-core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>dev.ikm.tinkar</groupId>
+			<artifactId>reasoner-elk-owl</artifactId>
+			<version>${tinkar-core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>dev.ikm.tinkar</groupId>
+			<artifactId>reasoner-elk-snomed</artifactId>
+			<version>${tinkar-core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>dev.ikm.tinkar</groupId>
+			<artifactId>reasoner-hybrid</artifactId>
+			<version>${tinkar-core.version}</version>
+		</dependency>
+
+		<!-- IKM JPMS Libraries -->
+		<dependency>
+			<groupId>${tinkar-jpms-deps.groupId}</groupId>
+			<artifactId>eclipse-collections-api</artifactId>
+		</dependency>
+
+		<!-- Misc. -->
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+		</dependency>
+
+		<!-- Logging Dependencies -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+		</dependency>
+
+		<!-- Testing Dependencies -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-console</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+</project>
