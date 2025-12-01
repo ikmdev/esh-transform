@@ -50,5 +50,6 @@ public class ESHTinkarizer {
 				}
 			}
 		}
+		LOG.info("Skipped {} of Event Code to Event Set Is-As", (long) Debug.ecParents.size());
 	}
 }

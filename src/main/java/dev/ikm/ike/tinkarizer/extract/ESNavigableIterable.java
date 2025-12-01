@@ -39,7 +39,6 @@ public class ESNavigableIterable implements Iterable<List<NavigableData>> {
 				List<NavigableData> batch = new ArrayList<>(batchSize);
 				while (csvIterator.hasNext() && batch.size() < batchSize) {
 					CSVRecord csvRecord = csvIterator.next();
-
 					if (!csvRecord.get("Event Set Name").isEmpty()) {
 						UUID parentId = UuidT5Generator.get(ES_NAMESPACE, csvRecord.get("Event Set Name"));
 						parentNameReference.set(csvRecord.get("Event Set Name"));
@@ -53,9 +52,6 @@ public class ESNavigableIterable implements Iterable<List<NavigableData>> {
 						batch.add(new NavigableData(csvRecord.get("Child Set Name"), childId, parentNameReference.get(), parentReference.get()));
 					}
 				}
-//				if (batch.stream().anyMatch(navigableData -> navigableData.parentId() == null)) {
-//					System.out.println("break");
-//				}
 				return batch;
 			}
 		};

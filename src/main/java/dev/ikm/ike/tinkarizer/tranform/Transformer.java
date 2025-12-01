@@ -80,11 +80,9 @@ public class Transformer implements AutoCloseable{
 	}
 
 	public void viewableTransformation(List<ViewableData> viewableData) {
-		UUID transformID = UUID.randomUUID();
-		LOG.info("Start transformation {} of Viewable Data ({})", transformID, viewableData.size());
 
 		for (ViewableData data : viewableData) {
-			Concept concept = Concept.make(PublicIds.of(data.id()));
+			Concept concept = Concept.make(PublicIds.of(data.ids()));
 
 			//Create Concept Active or Inactive
 			if (data.isActive()) {
@@ -134,7 +132,7 @@ public class Transformer implements AutoCloseable{
 				semanticCounter.incrementAndGet();
 			}
 		}
-		LOG.info("Finish transformation {} of Viewable Data", transformID);
+		LOG.info("Finish transforming {} Viewable Data", viewableData.size());
 	}
 
 	public void navigableTransformation(List<NavigableData> navigableData) {
@@ -149,6 +147,7 @@ public class Transformer implements AutoCloseable{
 			Concept parent = Concept.make(PublicIds.of(navData.parentId()));
 			activeSession.compose(new StatedAxiom().isA(parent), reference);
 		}
+		LOG.info("Finish transforming {} Navigable Data", navigableData.size());
 	}
 
 	@Override

@@ -36,7 +36,8 @@ public class ECViewableIterable implements Iterable<List<ViewableData>>{
 					CSVRecord csvRecord = csvIterator.next();
 					if (!csvRecord.get("Event Set Name").isEmpty()) {
 						batch.add(new ViewableData(
-								UuidT5Generator.get(EC_NAMESPACE, csvRecord.get("Code Value") + "|" + csvRecord.get("Prev Display")),
+								List.of(UuidT5Generator.get(EC_NAMESPACE,
+										csvRecord.get("Code Value") + "|" + csvRecord.get("Prev Display"))),
 								csvRecord.get("Status").equalsIgnoreCase("active"),
 								csvRecord.get("Prev Display"),
 								csvRecord.get("Description"),

@@ -1,5 +1,6 @@
 package dev.ikm.ike.tinkarizer.extract;
 
+import dev.ikm.ike.tinkarizer.Debug;
 import dev.ikm.ike.tinkarizer.entity.ViewableData;
 import dev.ikm.tinkar.common.util.uuid.UuidT5Generator;
 import org.apache.commons.csv.CSVRecord;
@@ -35,8 +36,14 @@ public class ESViewableIterable implements Iterable<List<ViewableData>> {
 				while (csvIterator.hasNext() && batch.size() < batchSize) {
 					CSVRecord csvRecord = csvIterator.next();
 					if (!csvRecord.get("Event Set Name").isEmpty()) {
+						//Debugging
+						Debug.esViewableIds.add(UuidT5Generator.get(ES_NAMESPACE, csvRecord.get("Event Set Name")));
+						//
 						batch.add(new ViewableData(
-								UuidT5Generator.get(ES_NAMESPACE, csvRecord.get("Event Set Name")),
+								List.of(
+										UuidT5Generator.get(ES_NAMESPACE, csvRecord.get("Event Set Name")),
+										UuidT5Generator.get(ES_NAMESPACE, csvRecord.get("Event Set Name").toUpperCase()),
+										UuidT5Generator.get(ES_NAMESPACE, csvRecord.get("Event Set Name").toLowerCase())),
 								true,
 								csvRecord.get("Event Set Name"),
 								csvRecord.get("Event Set Disp"),
