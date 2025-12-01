@@ -1,30 +1,16 @@
-package dev.ikm.ike.tinkarizer;
+package dev.ikm.ike.tinkarizer.database;
 
 import dev.ikm.tinkar.common.service.CachingService;
 import dev.ikm.tinkar.common.service.PrimitiveData;
 import dev.ikm.tinkar.common.service.ServiceKeys;
 import dev.ikm.tinkar.common.service.ServiceProperties;
 import dev.ikm.tinkar.entity.EntityService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
-class Database {
+public class Database implements AutoCloseable {
 
-	Logger LOG = LoggerFactory.getLogger(Database.class);
-
-	private final String databaseName;
-	private final File dbPath;
-
-	public Database(String databaseName, File dbPath) {
-		this.databaseName = databaseName;
-		this.dbPath = dbPath;
-
-	}
-
-	public void start() {
-		LOG.info("Starting database...");
+	public Database(File dbPath, String databaseName) {
 		CachingService.clearAll();
 		ServiceProperties.set(ServiceKeys.DATA_STORE_ROOT, dbPath);
 		PrimitiveData.selectControllerByName(databaseName);
@@ -32,8 +18,8 @@ class Database {
 		EntityService.get().beginLoadPhase();
 	}
 
-	public void shutdown() {
-		LOG.info("Stopping database...");
+	@Override
+	public void close() throws Exception {
 		EntityService.get().endLoadPhase();
 		PrimitiveData.stop();
 	}

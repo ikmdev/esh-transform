@@ -1,36 +1,54 @@
 package dev.ikm.ike.tinkarizer;
 
+import dev.ikm.ike.tinkarizer.database.Database;
+import dev.ikm.ike.tinkarizer.entity.NavigableData;
+import dev.ikm.ike.tinkarizer.entity.ViewableData;
+import dev.ikm.ike.tinkarizer.extract.Extractor;
+import dev.ikm.ike.tinkarizer.tranform.Transformer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class ESHTinkarizer {
 
-	private final Database database;
-	private final Parser parser;
-	private final Transformer transformer;
+	private static final Logger LOG = LoggerFactory.getLogger(ESHTinkarizer.class);
 
-	public ESHTinkarizer(String databaseName, File dbPath, File eventSetCSV, File eventCodeCSV, long time) {
-		this.database = new Database(databaseName, dbPath);
-		this.database.start();
-		this.parser = new Parser(100_000, eventSetCSV, eventCodeCSV);
-		this.transformer = new Transformer(time);
+	private final String databaseName;
+	private final File dbPath;
+	private final File eventSetCSV;
+	private final File eventCodeCSV;
+
+	public ESHTinkarizer(String databaseName, File dbPath, File eventSetCSV, File eventCodeCSV) {
+		this.databaseName = databaseName;
+		this.dbPath = dbPath;
+		this.eventSetCSV = eventSetCSV;
+		this.eventCodeCSV = eventCodeCSV;
 	}
 
-	public void run() {
-		parser.parseViewableData(viewableData -> {
-			try(ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
-				Future<?> transformFuture = executor.submit(() -> transformer.viewableTransformation().accept(viewableData));
-				transformFuture.get();
-			} catch (Exception e) {
-				e.printStackTrace();
+	public void run() throws Exception {
+		try (Database database = new Database(dbPath, databaseName)) {
+			try (Transformer transformer = new Transformer(System.currentTimeMillis())) {
+				try (Extractor extractor = new Extractor(eventSetCSV, eventCodeCSV, 50_000)) {
+					List<CompletableFuture<Void>> completableFutures = new ArrayList<>();
+
+					for (List<ViewableData> viewableData : extractor.viewableData()) {
+						completableFutures.add(CompletableFuture.runAsync(() -> {
+							transformer.viewableTransformation(viewableData);
+						}));
+					}
+
+					for (List<NavigableData> navigableData : extractor.navigableData()) {
+						completableFutures.add(CompletableFuture.runAsync(() -> {
+							transformer.navigableTransformation(navigableData);
+						}));
+					}
+					CompletableFuture.allOf(completableFutures.toArray(new CompletableFuture[0])).join();
+				}
 			}
-		});
-
-		transformer.commit();
-
-		//Shutdown database
-		database.shutdown();
+		}
 	}
 }
