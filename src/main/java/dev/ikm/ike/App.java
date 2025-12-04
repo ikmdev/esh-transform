@@ -14,7 +14,7 @@ public class App {
 
 	private static final Instant start = Instant.now();
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		if (args.length < 3) {
 			LOG.error("Usage: java App <db_path> <event_set_csv_path> <event_code_csv_path>");
 			System.exit(1);
@@ -27,8 +27,7 @@ public class App {
 				new File(args[2]));
 		eshtinkarizer.run();
 
-
 		Duration duration = Duration.between(start, Instant.now());
-		LOG.info("Transformation complete in {} min {}s", duration.toMinutes(), duration.getSeconds() % 60);
+		LOG.info("Tinkarization complete in {} min {}s", duration.toMinutes(), duration.getSeconds() % 60);
 	}
 }

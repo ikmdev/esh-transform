@@ -1,7 +1,9 @@
-package dev.ikm.ike.tinkarizer.tranform;
+package dev.ikm.ike.tinkarizer.etl;
 
-import dev.ikm.ike.tinkarizer.entity.NavigableData;
-import dev.ikm.ike.tinkarizer.entity.ViewableData;
+import dev.ikm.ike.tinkarizer.entity.NavigableDatum;
+import dev.ikm.ike.tinkarizer.entity.NavigableExtract;
+import dev.ikm.ike.tinkarizer.entity.ViewableDatum;
+import dev.ikm.ike.tinkarizer.entity.ViewableExtract;
 import dev.ikm.tinkar.common.id.PublicIds;
 import dev.ikm.tinkar.composer.Composer;
 import dev.ikm.tinkar.composer.Session;
@@ -23,14 +25,15 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Transformer implements AutoCloseable{
+public class Loader implements AutoCloseable{
 
-	Logger LOG = LoggerFactory.getLogger(Transformer.class);
+	Logger LOG = LoggerFactory.getLogger(Loader.class);
 
 	private static final Concept ESH_AUTHOR_CONCEPT = Concept.make(PublicIds.of(UUID.fromString("5ffd229a-aaa1-4a93-9577-8950f86a2454")));
 	private static final Concept ESH_MODULE_CONCEPT = Concept.make(PublicIds.of(UUID.fromString("fd7b189b-eeba-4a41-98bb-b101cf80ef02")));
 	private static final Concept ESH_MODEL_CONCEPT = Concept.make(PublicIds.of(UUID.fromString("f0b69a19-ba4f-4e52-b30e-d998f028f0ab")));
 	private static final Concept EC_IDENTIFIER_CONCEPT = Concept.make(PublicIds.of(UUID.fromString("9900bd6e-42d4-4484-80f2-cea339c956b5")));
+
 
 	private final Composer composer;
 	private final Session activeSession;
@@ -40,7 +43,7 @@ public class Transformer implements AutoCloseable{
 	private final AtomicInteger semanticCounter;
 
 
-	public Transformer(long stampTime) {
+	public Loader(long stampTime) {
 		this.composer = new Composer("Event Set Hierarchy");
 		this.activeSession = composer.open(
 				State.ACTIVE,
@@ -79,67 +82,75 @@ public class Transformer implements AutoCloseable{
 				.attach((StatedAxiom stated) -> stated.isA(TinkarTermV2.IDENTIFIER_SOURCE)));
 	}
 
-	public void viewableTransformation(List<ViewableData> viewableData) {
+	public void loadViewableData(List<ViewableDatum> viewableData) {
 
-		for (ViewableData data : viewableData) {
-			Concept concept = Concept.make(PublicIds.of(data.ids()));
-
-			//Create Concept Active or Inactive
-			if (data.isActive()) {
-				activeSession.compose((ConceptAssembler conceptAssembler) -> conceptAssembler.publicId(concept.publicId()));
-				conceptCounter.incrementAndGet();
-			} else {
-				inactiveSession.compose((ConceptAssembler conceptAssembler) -> conceptAssembler.publicId(concept.publicId()));
-				conceptCounter.incrementAndGet();
-			}
-
-			//Create FQN Semantic
-			Semantic fqn = Semantic.make(PublicIds.newRandom());
-			activeSession.compose(new FullyQualifiedName()
-					.semantic(fqn)
-					.language(TinkarTermV2.ENGLISH_LANGUAGE)
-					.text(data.fqn())
-					.caseSignificance(TinkarTermV2.DESCRIPTION_NOT_CASE_SENSITIVE), concept);
-			semanticCounter.incrementAndGet();
-			activeSession.compose(new USDialect().acceptability(TinkarTermV2.PREFERRED), fqn);
-			semanticCounter.incrementAndGet();
-
-			//Create SYN Semantic
-			Semantic syn = Semantic.make(PublicIds.newRandom());
-			activeSession.compose(new Synonym()
-					.semantic(syn)
-					.language(TinkarTermV2.ENGLISH_LANGUAGE)
-					.text(data.syn().isEmpty() ? data.fqn() : data.syn())
-					.caseSignificance(TinkarTermV2.DESCRIPTION_NOT_CASE_SENSITIVE), concept);
-			semanticCounter.incrementAndGet();
-			activeSession.compose(new USDialect().acceptability(TinkarTermV2.PREFERRED), syn);
-			semanticCounter.incrementAndGet();
-
-			//Create DEF Semantic
-			Semantic def = Semantic.make(PublicIds.newRandom());
-			activeSession.compose(new Definition()
-					.semantic(def)
-					.language(TinkarTermV2.ENGLISH_LANGUAGE)
-					.text(data.def().isEmpty() ? data.fqn() : data.def())
-					.caseSignificance(TinkarTermV2.DESCRIPTION_NOT_CASE_SENSITIVE), concept);
-			semanticCounter.incrementAndGet();
-			activeSession.compose(new USDialect().acceptability(TinkarTermV2.PREFERRED), def);
-			semanticCounter.incrementAndGet();
-
-			//Create Identifier Semantic
-			if (!data.identifier().isEmpty()) {
-				activeSession.compose(new Identifier().source(EC_IDENTIFIER_CONCEPT).identifier(data.identifier()), concept);
-				semanticCounter.incrementAndGet();
-			}
-		}
-		LOG.info("Finish transforming {} Viewable Data", viewableData.size());
 	}
 
-	public void navigableTransformation(List<NavigableData> navigableData) {
+	public void loadNavigableData(List<NavigableDatum> navigableData) {
+
+	}
+
+	public void viewableTransformation(List<ViewableExtract> viewableData) {
+//
+//		for (ViewableExtract data : viewableData) {
+//			Concept concept = Concept.make(PublicIds.of(data.ids()));
+//
+//			//Create Concept Active or Inactive
+//			if (data.status()) {
+//				activeSession.compose((ConceptAssembler conceptAssembler) -> conceptAssembler.publicId(concept.publicId()));
+//				conceptCounter.incrementAndGet();
+//			} else {
+//				inactiveSession.compose((ConceptAssembler conceptAssembler) -> conceptAssembler.publicId(concept.publicId()));
+//				conceptCounter.incrementAndGet();
+//			}
+//
+//			//Create FQN Semantic
+//			Semantic fqn = Semantic.make(PublicIds.newRandom());
+//			activeSession.compose(new FullyQualifiedName()
+//					.semantic(fqn)
+//					.language(TinkarTermV2.ENGLISH_LANGUAGE)
+//					.text(data.fqn())
+//					.caseSignificance(TinkarTermV2.DESCRIPTION_NOT_CASE_SENSITIVE), concept);
+//			semanticCounter.incrementAndGet();
+//			activeSession.compose(new USDialect().acceptability(TinkarTermV2.PREFERRED), fqn);
+//			semanticCounter.incrementAndGet();
+//
+//			//Create SYN Semantic
+//			Semantic syn = Semantic.make(PublicIds.newRandom());
+//			activeSession.compose(new Synonym()
+//					.semantic(syn)
+//					.language(TinkarTermV2.ENGLISH_LANGUAGE)
+//					.text(data.syn().isEmpty() ? data.fqn() : data.syn())
+//					.caseSignificance(TinkarTermV2.DESCRIPTION_NOT_CASE_SENSITIVE), concept);
+//			semanticCounter.incrementAndGet();
+//			activeSession.compose(new USDialect().acceptability(TinkarTermV2.PREFERRED), syn);
+//			semanticCounter.incrementAndGet();
+//
+//			//Create DEF Semantic
+//			Semantic def = Semantic.make(PublicIds.newRandom());
+//			activeSession.compose(new Definition()
+//					.semantic(def)
+//					.language(TinkarTermV2.ENGLISH_LANGUAGE)
+//					.text(data.def().isEmpty() ? data.fqn() : data.def())
+//					.caseSignificance(TinkarTermV2.DESCRIPTION_NOT_CASE_SENSITIVE), concept);
+//			semanticCounter.incrementAndGet();
+//			activeSession.compose(new USDialect().acceptability(TinkarTermV2.PREFERRED), def);
+//			semanticCounter.incrementAndGet();
+//
+//			//Create Identifier Semantic
+//			if (!data.ids().isEmpty()) {
+//				activeSession.compose(new Identifier().source(EC_IDENTIFIER_CONCEPT).ids(data.ids()), concept);
+//				semanticCounter.incrementAndGet();
+//			}
+//		}
+//		LOG.info("Finish transforming {} Viewable Data", viewableData.size());
+	}
+
+	public void navigableTransformation(List<NavigableExtract> navigableData) {
 		//Need Stated Relationship to tie to main hierarchy
 		activeSession.compose(new StatedAxiom().isA(ESH_MODEL_CONCEPT), Concept.make(PublicIds.of(UUID.fromString("47e533f4-a3d8-5d5b-826d-24eb09d1f3ab"))));
 
-		for (NavigableData navData : navigableData) {
+		for (NavigableExtract navData : navigableData) {
 			Concept reference = Concept.make(PublicIds.of(navData.childId()));
 			if (navData.parentId() == null) {
 				System.out.println("break");
