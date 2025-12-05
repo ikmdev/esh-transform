@@ -74,6 +74,8 @@ public class Transformer {
 				}
 			}
 		}
+		//TODO-add in connection to root es concept with tinkar hierarchy
+
 
 		//Transform consolidated ES Navigation data
 		esIsA.forEach((childId, parentIds) -> navigableData.add(new NavigableDatum(childId, parentIds)));

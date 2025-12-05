@@ -1,10 +1,12 @@
 package dev.ikm.ike.tinkarizer;
 
+import dev.ikm.ike.tinkarizer.database.Database;
 import dev.ikm.ike.tinkarizer.entity.NavigableDatum;
 import dev.ikm.ike.tinkarizer.entity.NavigableExtract;
 import dev.ikm.ike.tinkarizer.entity.ViewableDatum;
 import dev.ikm.ike.tinkarizer.entity.ViewableExtract;
 import dev.ikm.ike.tinkarizer.etl.Extractor;
+import dev.ikm.ike.tinkarizer.etl.Loader;
 import dev.ikm.ike.tinkarizer.etl.Transformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,42 +31,25 @@ public class ESHTinkarizer {
 	}
 
 	public void run() {
-//		try (Database database = new Database(dbPath, databaseName)) {
+		try (Database database = new Database(dbPath, databaseName)) {
 
+			//Extract
 			Extractor extractor = new Extractor();
 			List<ViewableExtract> viewableExtracts = extractor.viewableData(eventSetCSV, eventCodeCSV);
 			List<NavigableExtract> navigableExtracts = extractor.navigableData(eventSetCSV, eventCodeCSV);
 
+			//Transform
 			Transformer transformer = new Transformer();
 			List<ViewableDatum> viewableData = transformer.transformViewableExtracts(viewableExtracts);
 			List<NavigableDatum> navigableData = transformer.transformNavigableExtracts(navigableExtracts);
 
+			//Load
+			try (Loader loader = new Loader(System.currentTimeMillis())) {
+				loader.loadViewableData(viewableData);
+				loader.loadNavigableData(navigableData);
+			}
 
-//			try(Loader loader = new Loader(System.currentTimeMillis())) {
-//				loader.loadViewableData(viewableData);
-//				loader.loadNavigableData(navigableData);
-//			}
-
-
-//			try (Loader transformer = new Loader()) {
-//				try (Extractor extract = new Extractor(eventSetCSV, eventCodeCSV, 50_000)) {
-//					List<CompletableFuture<Void>> completableFutures = new ArrayList<>();
-//
-//					for (List<ViewableExtract> viewableData : extract.viewableData()) {
-//						completableFutures.add(CompletableFuture.runAsync(() -> {
-//							transformer.viewableTransformation(viewableData);
-//						}));
-//					}
-//
-//					for (List<NavigableExtract> navigableData : extract.navigableData()) {
-//						completableFutures.add(CompletableFuture.runAsync(() -> {
-//							transformer.navigableTransformation(navigableData);
-//						}));
-//					}
-//					CompletableFuture.allOf(completableFutures.toArray(new CompletableFuture[0])).join();
-//				}
-//			}
-//		}
-		LOG.info("Skipped {} of Event Code to Event Set Is-As", transformer.getSkippedNavigableExtracts().size());
+			LOG.info("Skipped {} of Event Code to Event Set \"Is-As\" Relationships", transformer.getSkippedNavigableExtracts().size());
+		}
 	}
 }

@@ -19,7 +19,7 @@ public class Database implements AutoCloseable {
 	}
 
 	@Override
-	public void close() throws Exception {
+	public void close() {
 		EntityService.get().endLoadPhase();
 		PrimitiveData.stop();
 	}

@@ -5,4 +5,4 @@ import java.util.UUID;
 
 public record NavigableDatum(
 		UUID childId,
-		List<UUID> parentId) { }
+		List<UUID> parentIds) { }
