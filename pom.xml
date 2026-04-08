@@ -1,5 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -8,12 +9,21 @@
 		<version>1.64.0</version>
 	</parent>
 
-	<groupId>dev.ikm.ike</groupId>
-	<artifactId>esh-transform</artifactId>
+	<groupId>dev.ikm.ike.esh.tinkarizer</groupId>
+	<artifactId>esh-tinkarizer</artifactId>
 	<version>1.0-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>pom</packaging>
 
-	<name>Event Set Hierarchy Transformation</name>
+	<modules>
+		<module>esh-tinkarizer-cli</module>
+		<module>esh-tinkarizer-etl</module>
+		<module>esh-tinkarizer-event-code</module>
+		<module>esh-tinkarizer-event-set</module>
+		<module>esh-tinkarizer-intersect-grid</module>
+		<module>esh-tinkarizer-specialty-input</module>
+	</modules>
+
+	<name>Event Set Hierarchy Tinkarization</name>
 	<organization>
 		<name>Integrated Knowledge Management</name>
 		<url>http://www.ikm.dev</url>
@@ -59,6 +69,7 @@
 		<lucene-core.version>9.12.1</lucene-core.version>
 		<commons-csv.version>1.14.1</commons-csv.version>
 		<commons-collections4.version>4.5.0</commons-collections4.version>
+		<picocli.version>4.7.7</picocli.version>
 
 		<!-- Maven Properties -->
 		<skipITs>true</skipITs>
@@ -66,12 +77,14 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<!-- ESH Libraries -->
+			 <dependency>
+				<groupId>dev.ikm.ike.esh.tinkarizer</groupId>
+				<artifactId>esh-tinkarizer-etl</artifactId>
+				<version>${project.version}</version>
+			 </dependency>
+
 			<!-- Core Libraries -->
-			<dependency>
-				<groupId>${tinkar-core.groupId}</groupId>
-				<artifactId>data-ephemeral-provider</artifactId>
-				<version>${tinkar-core.version}</version>
-			</dependency>
 			<dependency>
 				<groupId>${tinkar-core.groupId}</groupId>
 				<artifactId>data-spinedarray-provider</artifactId>
@@ -126,76 +139,15 @@
 				<artifactId>commons-collections4</artifactId>
 				<version>${commons-collections4.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>info.picocli</groupId>
+				<artifactId>picocli</artifactId>
+				<version>${picocli.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
 	<dependencies>
-		<!-- IKE Libraries -->
-		<dependency>
-			<groupId>${tinkar-core.groupId}</groupId>
-			<artifactId>data-ephemeral-provider</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>${tinkar-core.groupId}</groupId>
-			<artifactId>data-spinedarray-provider</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>${tinkar-core.groupId}</groupId>
-			<artifactId>entity-provider</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>${tinkar-core.groupId}</groupId>
-			<artifactId>executor-provider</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>${tinkar-core.groupId}</groupId>
-			<artifactId>search-provider</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>dev.ikm.tinkar</groupId>
-			<artifactId>composer</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>dev.ikm.tinkar.ext.owl</groupId>
-			<artifactId>owl-extension</artifactId>
-			<version>${tinkar-core.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>dev.ikm.tinkar</groupId>
-			<artifactId>reasoner-elk-owl</artifactId>
-			<version>${tinkar-core.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>dev.ikm.tinkar</groupId>
-			<artifactId>reasoner-elk-snomed</artifactId>
-			<version>${tinkar-core.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>dev.ikm.tinkar</groupId>
-			<artifactId>reasoner-hybrid</artifactId>
-			<version>${tinkar-core.version}</version>
-		</dependency>
-
-		<!-- IKM JPMS Libraries -->
-		<dependency>
-			<groupId>${tinkar-jpms-deps.groupId}</groupId>
-			<artifactId>eclipse-collections-api</artifactId>
-		</dependency>
-
-		<!-- Misc. -->
-		<dependency>
-			<groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-csv</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-collections4</artifactId>
-		</dependency>
-
 		<!-- Logging Dependencies -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
