@@ -12,9 +12,10 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-import dev.ikm.ike.esh.tinkarizer.etl.Extractor;
 import dev.ikm.ike.esh.tinkarizer.etl.domain.NavigableSourceRecord;
 import dev.ikm.ike.esh.tinkarizer.etl.domain.ViewableSourceRecord;
+import dev.ikm.ike.esh.tinkarizer.etl.extractor.Extractor;
+import dev.ikm.ike.esh.tinkarizer.etl.index.EntityIndex;
 
 public class EventSetExtractor implements Extractor {
 
@@ -22,8 +23,10 @@ public class EventSetExtractor implements Extractor {
 	private File ecCSV;
 
 	private final CSVFormat csvFormat;
+	private final EntityIndex cache;
 
-	public EventSetExtractor() {
+	public EventSetExtractor(EntityIndex cache) {
+		this.cache = cache;
 		this.csvFormat = CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).get();
 	}
 

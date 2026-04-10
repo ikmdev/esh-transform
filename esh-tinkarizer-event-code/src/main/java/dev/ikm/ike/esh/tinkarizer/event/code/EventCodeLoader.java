@@ -8,7 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import dev.ikm.ike.esh.tinkarizer.etl.domain.NavigableCanonicalRecord;
 import dev.ikm.ike.esh.tinkarizer.etl.domain.ViewableCanonicalRecord;
-import dev.ikm.ike.esh.tinkarizer.etl.impl.AbstractLoader;
+import dev.ikm.ike.esh.tinkarizer.etl.loader.AbstractLoader;
+import dev.ikm.ike.esh.tinkarizer.starter.data.ESHStarterData;
 import dev.ikm.tinkar.common.id.PublicIds;
 import dev.ikm.tinkar.composer.assembler.ConceptAssembler;
 import dev.ikm.tinkar.composer.template.Definition;
@@ -48,14 +49,12 @@ public class EventCodeLoader extends AbstractLoader {
 				.attach((StatedAxiom stated) -> stated.isA(TinkarTermV2.IDENTIFIER_SOURCE)));
 
 		// Attached Root
-		Concept eshModel = Concept.make(PublicIds.of(UUID.fromString("f0b69a19-ba4f-4e52-b30e-d998f028f0ab")));
-		Concept esRoot = Concept.make(PublicIds.of(UUID.fromString("47e533f4-a3d8-5d5b-826d-24eb09d1f3ab")));
-		activeSession.compose(new StatedAxiom().isA(eshModel), esRoot);
+		activeSession.compose(new StatedAxiom().isA(ESHStarterData.ESH_MODEL_CONCEPT), ESHStarterData.EVENT_SET_ROOT_CONCEPT);
 	}
 
 	public void loadViewableData(List<ViewableCanonicalRecord> viewableData) {
 		viewableData.forEach(data -> {
-			Concept concept = Concept.make(PublicIds.of(data.ids()));
+			Concept concept = Concept.make(PublicIds.of(data.conceptId()));
 
 			// Create Concept Active or Inactive
 			if (data.isActive()) {

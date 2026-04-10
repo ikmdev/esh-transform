@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>esh-tinkarizer-intersect-grid</artifactId>
+	<packaging>jar</packaging>
 
     <dependencies>
 		<!-- ESH Libraries -->

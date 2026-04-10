@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>esh-tinkarizer-event-set</artifactId>
+	<packaging>jar</packaging>
 
     <dependencies>
 		<!-- ESH Libraries -->

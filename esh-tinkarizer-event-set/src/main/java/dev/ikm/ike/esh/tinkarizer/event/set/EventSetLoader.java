@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import dev.ikm.ike.esh.tinkarizer.etl.domain.NavigableCanonicalRecord;
 import dev.ikm.ike.esh.tinkarizer.etl.domain.ViewableCanonicalRecord;
-import dev.ikm.ike.esh.tinkarizer.etl.impl.AbstractLoader;
+import dev.ikm.ike.esh.tinkarizer.etl.loader.AbstractLoader;
 import dev.ikm.tinkar.common.id.PublicIds;
 import dev.ikm.tinkar.composer.assembler.ConceptAssembler;
 import dev.ikm.tinkar.composer.template.Definition;
@@ -54,7 +54,7 @@ public class EventSetLoader extends AbstractLoader {
 
 	public void loadViewableData(List<ViewableCanonicalRecord> viewableData) {
 		viewableData.forEach(data -> {
-			Concept concept = Concept.make(PublicIds.of(data.ids()));
+			Concept concept = Concept.make(PublicIds.of(data.conceptId()));
 
 			// Create Concept Active or Inactive
 			if (data.isActive()) {

@@ -1,4 +1,4 @@
-package dev.ikm.ike.esh.tinkarizer.etl.impl;
+package dev.ikm.ike.esh.tinkarizer.etl.loader;
 
 import java.util.List;
 import java.util.UUID;
@@ -40,7 +40,7 @@ public class SimpleLoader extends AbstractLoader {
 	@Override
 	public void loadViewableData(List<ViewableCanonicalRecord> viewableData) {
 		viewableData.forEach(data -> {
-			Concept concept = Concept.make(PublicIds.of(data.ids()));
+			Concept concept = Concept.make(PublicIds.of(data.conceptId()));
 
 			// Create Concept Active or Inactive
 			if (data.isActive()) {

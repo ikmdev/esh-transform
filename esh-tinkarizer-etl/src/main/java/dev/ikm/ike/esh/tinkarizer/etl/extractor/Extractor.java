@@ -1,4 +1,4 @@
-package dev.ikm.ike.esh.tinkarizer.etl;
+package dev.ikm.ike.esh.tinkarizer.etl.extractor;
 
 import java.io.File;
 import java.util.List;

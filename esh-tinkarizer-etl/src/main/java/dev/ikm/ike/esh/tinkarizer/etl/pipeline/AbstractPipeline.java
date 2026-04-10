@@ -1,12 +1,10 @@
-package dev.ikm.ike.esh.tinkarizer.etl.impl;
+package dev.ikm.ike.esh.tinkarizer.etl.pipeline;
 
-import java.io.File;
 import java.util.Objects;
 
-import dev.ikm.ike.esh.tinkarizer.etl.Extractor;
-import dev.ikm.ike.esh.tinkarizer.etl.Loader;
-import dev.ikm.ike.esh.tinkarizer.etl.Pipeline;
-import dev.ikm.ike.esh.tinkarizer.etl.Transformer;
+import dev.ikm.ike.esh.tinkarizer.etl.extractor.Extractor;
+import dev.ikm.ike.esh.tinkarizer.etl.loader.Loader;
+import dev.ikm.ike.esh.tinkarizer.etl.transformer.Transformer;
 
 public abstract class AbstractPipeline implements Pipeline {
 
@@ -19,8 +17,5 @@ public abstract class AbstractPipeline implements Pipeline {
 		this.transformer = Objects.requireNonNull(transformer, "transformer cannot be null");
 		this.loader = Objects.requireNonNull(loader, "loader cannot be null");
 	}
-
-	@Override
-	public abstract void run(File dbPath, String dbName);
 
 }

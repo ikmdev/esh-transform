@@ -21,6 +21,7 @@
 		<module>esh-tinkarizer-event-set</module>
 		<module>esh-tinkarizer-intersect-grid</module>
 		<module>esh-tinkarizer-specialty-input</module>
+		<module>esh-starter-data</module>
 	</modules>
 
 	<name>Event Set Hierarchy Tinkarization</name>
@@ -81,6 +82,11 @@
 			 <dependency>
 				<groupId>dev.ikm.ike.esh.tinkarizer</groupId>
 				<artifactId>esh-tinkarizer-etl</artifactId>
+				<version>${project.version}</version>
+			 </dependency>
+			 <dependency>
+				<groupId>dev.ikm.ike.esh.tinkarizer</groupId>
+				<artifactId>esh-starter-data</artifactId>
 				<version>${project.version}</version>
 			 </dependency>
 

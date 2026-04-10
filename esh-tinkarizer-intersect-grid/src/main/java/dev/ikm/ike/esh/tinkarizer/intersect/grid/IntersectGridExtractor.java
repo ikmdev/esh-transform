@@ -12,9 +12,9 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-import dev.ikm.ike.esh.tinkarizer.etl.Extractor;
 import dev.ikm.ike.esh.tinkarizer.etl.domain.NavigableSourceRecord;
 import dev.ikm.ike.esh.tinkarizer.etl.domain.ViewableSourceRecord;
+import dev.ikm.ike.esh.tinkarizer.etl.extractor.Extractor;
 
 public class IntersectGridExtractor implements Extractor {
 

@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>esh-tinkarizer-specialty-input</artifactId>
+    <packaging>jar</packaging>
 
     <dependencies>
         <!-- ESH Libraries -->
