@@ -8,6 +8,9 @@ import org.slf4j.Logger;
 
 import dev.ikm.ike.esh.tinkarizer.etl.extract.Extractor;
 import dev.ikm.ike.esh.tinkarizer.etl.index.EntityIndex;
+import dev.ikm.ike.esh.tinkarizer.etl.initialize.Initializer;
+import dev.ikm.ike.esh.tinkarizer.etl.initialize.NoOpInitializer;
+import dev.ikm.ike.esh.tinkarizer.etl.load.LoadConfig;
 import dev.ikm.ike.esh.tinkarizer.etl.load.Loader;
 import dev.ikm.ike.esh.tinkarizer.etl.load.SimpleLoader;
 import dev.ikm.ike.esh.tinkarizer.etl.pipeline.BatchPipeline;
@@ -15,8 +18,12 @@ import dev.ikm.ike.esh.tinkarizer.etl.pipeline.Pipeline;
 import dev.ikm.ike.esh.tinkarizer.etl.pipeline.PipelineConfig;
 import dev.ikm.ike.esh.tinkarizer.etl.pipeline.PipelineOrchestrator;
 import dev.ikm.ike.esh.tinkarizer.etl.transform.Transformer;
+import dev.ikm.ike.esh.tinkarizer.etl.validation.NoOpValidator;
+import dev.ikm.ike.esh.tinkarizer.etl.validation.Validator;
+import dev.ikm.ike.esh.tinkarizer.etl.verification.NoOpVerifier;
+import dev.ikm.ike.esh.tinkarizer.etl.verification.Verifier;
 import dev.ikm.ike.esh.tinkarizer.event.code.EventCodeExtractor;
-import dev.ikm.ike.esh.tinkarizer.event.code.EventCodeLoader;
+import dev.ikm.ike.esh.tinkarizer.event.code.EventCodeInitializer;
 import dev.ikm.ike.esh.tinkarizer.event.code.EventCodeTransformer;
 import dev.ikm.ike.esh.tinkarizer.event.set.EventSetExtractor;
 import dev.ikm.ike.esh.tinkarizer.event.set.EventSetTransformer;
@@ -75,33 +82,40 @@ public class App implements Callable<Integer> {
     }
 
     private Pipeline createEventCodePipeline(EntityIndex globalIndex, long time) {
-
+        Initializer initializer = new EventCodeInitializer();
         Extractor eventCodeExtractor = new EventCodeExtractor(globalIndex);
+        Transformer eventCodeTransformer = new EventCodeTransformer(globalIndex);
+        Validator validator = new NoOpValidator();
+        Loader eventCodeLoader = new SimpleLoader();
+        Verifier verification = new NoOpVerifier();
+
         eventCodeExtractor.addFileToExtract(eventCodeFile.toFile());
 
-        Transformer eventCodeTransformer = new EventCodeTransformer(globalIndex);
+        PipelineConfig ecPipelineConfig = new PipelineConfig("Event Code Pipeline", initializer, eventCodeExtractor,
+                eventCodeTransformer, validator, eventCodeLoader, verification);
+        LoadConfig loadConfig = new LoadConfig(time, ESHStarterData.ESH_AUTHOR_UUID, ESHStarterData.ESH_MODULE_UUID,
+                ESHStarterData.DEVELOPMENT_PATH_UUID);
 
-        Loader eventCodeLoader = new EventCodeLoader();
-
-        PipelineConfig eventCodeConfig = new PipelineConfig("Event Code Composer", time, ESHStarterData.ESH_AUTHOR_UUID,
-                ESHStarterData.ESH_MODULE_UUID, ESHStarterData.DEVELOPMENT_PATH_UUID);
-
-        return new BatchPipeline(eventCodeConfig, 1_000, eventCodeExtractor, eventCodeTransformer, eventCodeLoader);
+        return new BatchPipeline(ecPipelineConfig, loadConfig, 1_000);
     }
 
     private Pipeline createEventSetPipeline(EntityIndex globalIndex, long time) {
 
+        Initializer initializer = new NoOpInitializer();
         Extractor eventSetExtractor = new EventSetExtractor(globalIndex);
+        Transformer eventSetTransformer = new EventSetTransformer();
+        Validator validator = new NoOpValidator();
+        Loader eventSetLoader = new SimpleLoader();
+        Verifier verification = new NoOpVerifier();
+
         eventSetExtractor.addFileToExtract(eventSetFile.toFile());
 
-        Transformer eventSetTransformer = new EventSetTransformer();
+        PipelineConfig eventSetConfig = new PipelineConfig("Event Set Composer", initializer, eventSetExtractor,
+                eventSetTransformer, validator, eventSetLoader, verification);
+        LoadConfig loadConfig = new LoadConfig(time, ESHStarterData.ESH_AUTHOR_UUID, ESHStarterData.ESH_MODULE_UUID,
+                ESHStarterData.DEVELOPMENT_PATH_UUID);
 
-        Loader eventSetLoader = new SimpleLoader();
-
-        PipelineConfig eventSetConfig = new PipelineConfig("Event Set Composer", time, ESHStarterData.ESH_AUTHOR_UUID,
-                ESHStarterData.ESH_MODULE_UUID, ESHStarterData.DEVELOPMENT_PATH_UUID);
-                
-        return new BatchPipeline(eventSetConfig, 1_000, eventSetExtractor, eventSetTransformer, eventSetLoader);
+        return new BatchPipeline(eventSetConfig, loadConfig, 1_000);
     }
 
     private static void validateDatastore(Path datastorePath) {

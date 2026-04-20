@@ -5,7 +5,7 @@ import dev.ikm.ike.esh.tinkarizer.etl.initialize.Initializer;
 import dev.ikm.ike.esh.tinkarizer.etl.load.Loader;
 import dev.ikm.ike.esh.tinkarizer.etl.transform.Transformer;
 import dev.ikm.ike.esh.tinkarizer.etl.validation.Validator;
-import dev.ikm.ike.esh.tinkarizer.etl.verification.Verification;
+import dev.ikm.ike.esh.tinkarizer.etl.verification.Verifier;
 
 public record PipelineConfig(
 		String pipelineName,
@@ -14,6 +14,6 @@ public record PipelineConfig(
 		Transformer transformer,
 		Validator validator,
 		Loader loader,
-		Verification verification) {
+		Verifier verification) {
 	
 }

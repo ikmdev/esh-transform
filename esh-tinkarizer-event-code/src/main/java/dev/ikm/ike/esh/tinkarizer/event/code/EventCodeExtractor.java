@@ -40,6 +40,26 @@ public class EventCodeExtractor implements Extractor {
 	}
 
 	@Override
+	public List<NavigableSourceRecord> extractNavigableData() {
+		// Event Code Navigable Data
+		List<NavigableSourceRecord> ecNavigableData = new ArrayList<>();
+		eventCodeSources.forEach(eventCodeSource -> {
+			try (Reader ecReader = new FileReader(eventCodeSource); CSVParser ecParser = csvFormat.parse(ecReader)) {
+				for (CSVRecord csvRecord : ecParser.getRecords()) {
+					if (!csvRecord.get("Prev Display").isEmpty()) {
+						NavigableSourceRecord navigableSourceRecord = new NavigableSourceRecord("active",
+								csvRecord.get("Code Value"), csvRecord.get("Event Set Name"));
+						ecNavigableData.add(navigableSourceRecord);
+					}
+				}
+			} catch (IOException ioException) {
+				throw new RuntimeException(ioException);
+			}
+		});
+		return ecNavigableData;
+	}
+
+	@Override
 	public List<ViewableSourceRecord> extractViewableData() {
 		// Event Code Viewable Data
 		List<ViewableSourceRecord> ecViewableData = new ArrayList<>();
@@ -58,26 +78,6 @@ public class EventCodeExtractor implements Extractor {
 			}
 		});
 		return ecViewableData;
-	}
-
-	@Override
-	public List<NavigableSourceRecord> getExtractedNavigableData() {
-		// Event Code Navigable Data
-		List<NavigableSourceRecord> ecNavigableData = new ArrayList<>();
-		eventCodeSources.forEach(eventCodeSource -> {
-			try (Reader ecReader = new FileReader(eventCodeSource); CSVParser ecParser = csvFormat.parse(ecReader)) {
-				for (CSVRecord csvRecord : ecParser.getRecords()) {
-					if (!csvRecord.get("Prev Display").isEmpty()) {
-						NavigableSourceRecord navigableSourceRecord = new NavigableSourceRecord("active",
-								csvRecord.get("Code Value"), csvRecord.get("Event Set Name"));
-						ecNavigableData.add(navigableSourceRecord);
-					}
-				}
-			} catch (IOException ioException) {
-				throw new RuntimeException(ioException);
-			}
-		});
-		return ecNavigableData;
 	}
 
 }

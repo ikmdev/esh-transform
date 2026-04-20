@@ -12,14 +12,26 @@ public record LoadConfig(long time, UUID author, UUID module, UUID path) {
 		return Concept.make(authorPublicId);
 	}
 
+	public PublicId authorPublicId() {
+		return PublicIds.of(author);
+	}
+
 	public Concept moduleConcept() {
 		PublicId modulePublicId = PublicIds.of(module);
 		return Concept.make(modulePublicId);
 	}
 
+	public PublicId modulePublicId() {
+		return PublicIds.of(module);
+	}
+
 	public Concept pathConcept() {
 		PublicId pathPublicId = PublicIds.of(path);
 		return Concept.make(pathPublicId);
+	}
+
+	public PublicId pathPublicId() {
+		return PublicIds.of(path);
 	}
 
 }

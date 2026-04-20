@@ -15,6 +15,7 @@ import dev.ikm.tinkar.entity.ConceptRecord;
 import dev.ikm.tinkar.entity.ConceptRecordBuilder;
 import dev.ikm.tinkar.entity.ConceptVersionRecord;
 import dev.ikm.tinkar.entity.ConceptVersionRecordBuilder;
+import dev.ikm.tinkar.entity.Entity;
 import dev.ikm.tinkar.entity.EntityService;
 import dev.ikm.tinkar.entity.RecordListBuilder;
 import dev.ikm.tinkar.entity.SemanticEntity;
@@ -23,14 +24,30 @@ import dev.ikm.tinkar.entity.SemanticRecord;
 import dev.ikm.tinkar.entity.SemanticRecordBuilder;
 import dev.ikm.tinkar.entity.SemanticVersionRecord;
 import dev.ikm.tinkar.entity.SemanticVersionRecordBuilder;
+import dev.ikm.tinkar.entity.StampEntity;
+import dev.ikm.tinkar.entity.transaction.Transaction;
 import dev.ikm.tinkar.terms.EntityProxy;
 import dev.ikm.tinkar.terms.EntityProxy.Concept;
 import dev.ikm.tinkar.terms.EntityProxy.Pattern;
 import dev.ikm.tinkar.terms.EntityProxy.Semantic;
 
-public class Write {
+public class Writer {
 
-	private static final Logger LOG = LoggerFactory.getLogger(Write.class);
+	private static final Logger LOG = LoggerFactory.getLogger(Writer.class);
+
+	private final Transaction transaction;
+	private final StampEntity<?> activeStamp;
+	private final StampEntity<?> inactiveStamp;
+
+	public Writer(Transaction transaction, StampEntity<?> activeStampEntity, StampEntity<?> inactiveStampEntity) {
+		this.transaction = transaction;
+		this.activeStamp = activeStampEntity;
+		this.inactiveStamp = inactiveStampEntity;
+	}
+
+	private void writeEntity(Entity entity) {
+		EntityService.get().putEntity(entity);
+	}
 
 	private long[] createAdditionalLongs(PublicId publicId) {
 		long[] additionalLongs = new long[(publicId.uuidCount() * 2) - 2];
@@ -43,7 +60,7 @@ public class Write {
 		return additionalLongs.length == 0 ? null : additionalLongs;
 	}
 
-	public void concept(Concept concept, PublicId stampId) {
+	public void writeConcept(Concept concept, boolean isActive) {
 		// Pull out primordial UUID from PublicId
 		UUID primordialUUID = concept.asUuidArray()[0];
 
@@ -54,7 +71,7 @@ public class Write {
 		RecordListBuilder<ConceptVersionRecord> versions = RecordListBuilder.make();
 
 		// Assign nids for PublicIds
-		int stampNid = EntityService.get().nidForPublicId(stampId);
+		int stampNid = EntityService.get().nidForPublicId(isActive ? activeStamp : inactiveStamp);
 
 		// Create Concept Chronology
 		ConceptRecord conceptRecord = ConceptRecordBuilder.builder().nid(concept.nid())
@@ -68,10 +85,11 @@ public class Write {
 		// Rebuild the ConceptRecord with the now populated version data
 		ConceptEntity<? extends ConceptEntityVersion> conceptEntity = ConceptRecordBuilder.builder(conceptRecord)
 				.versions(versions.toImmutable()).build();
-		EntityService.get().putEntity(conceptEntity);
+		writeEntity(conceptEntity);
+		transaction.addComponent(concept.nid());
 	}
 
-	public void semantic(Semantic semantic, PublicId stampId, EntityProxy referencedComponent, Pattern pattern,
+	public void writeSemantic(Semantic semantic, boolean isActive, EntityProxy referencedComponent, Pattern pattern,
 			ImmutableList<Object> fieldValues) {
 		// Assign primordial UUID from PublicId
 		UUID primordialUUID = semantic.asUuidArray()[0];
@@ -83,7 +101,7 @@ public class Write {
 		RecordListBuilder<SemanticVersionRecord> versions = RecordListBuilder.make();
 
 		// Assign nids for PublicIds
-		int stampNid = EntityService.get().nidForPublicId(stampId);
+		int stampNid = EntityService.get().nidForPublicId(isActive ? activeStamp : inactiveStamp);
 
 		// Create Semantic Chronology
 		SemanticRecord semanticRecord = SemanticRecordBuilder.builder().nid(semantic.nid())
@@ -99,6 +117,7 @@ public class Write {
 		// Rebuild the Semantic with the now populated version data
 		SemanticEntity<? extends SemanticEntityVersion> semanticEntity = SemanticRecordBuilder.builder(semanticRecord)
 				.versions(versions.toImmutable()).build();
-		EntityService.get().putEntity(semanticEntity);
+		writeEntity(semanticEntity);
+		transaction.addComponent(semantic.nid());
 	}
 }

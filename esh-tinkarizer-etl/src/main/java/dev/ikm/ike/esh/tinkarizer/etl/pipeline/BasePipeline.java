@@ -16,9 +16,13 @@ import dev.ikm.ike.esh.tinkarizer.etl.extract.Extractor;
 import dev.ikm.ike.esh.tinkarizer.etl.initialize.Initializer;
 import dev.ikm.ike.esh.tinkarizer.etl.load.LoadConfig;
 import dev.ikm.ike.esh.tinkarizer.etl.load.Loader;
+import dev.ikm.ike.esh.tinkarizer.etl.load.Writer;
 import dev.ikm.ike.esh.tinkarizer.etl.transform.Transformer;
 import dev.ikm.ike.esh.tinkarizer.etl.validation.Validator;
-import dev.ikm.ike.esh.tinkarizer.etl.verification.Verification;
+import dev.ikm.ike.esh.tinkarizer.etl.verification.Verifier;
+import dev.ikm.tinkar.entity.StampEntity;
+import dev.ikm.tinkar.entity.transaction.Transaction;
+import dev.ikm.tinkar.terms.State;
 
 public abstract class BasePipeline implements Pipeline {
 
@@ -29,9 +33,9 @@ public abstract class BasePipeline implements Pipeline {
 	protected final Transformer transformer;
 	protected final Loader loader;
 	protected final Validator validator;
-	protected final Verification verification;
+	protected final Verifier verification;
 	protected final PipelineConfig pipelineConfig;
-	protected final LoadConfig writeConfig;
+	protected final LoadConfig loadConfig;
 
 	protected final List<ViewableSourceRecord> viewableSourceRecords;
 	protected final List<NavigableSourceRecord> navigableSourceRecords;
@@ -40,7 +44,7 @@ public abstract class BasePipeline implements Pipeline {
 
 	public BasePipeline(PipelineConfig pipelineConfig, LoadConfig writeConfig) {
 		this.pipelineConfig = Objects.requireNonNull(pipelineConfig, "pipelineConfig cannot be null");
-		this.writeConfig = Objects.requireNonNull(writeConfig, "writeConfig cannot be null");
+		this.loadConfig = Objects.requireNonNull(writeConfig, "writeConfig cannot be null");
 		this.extractor = Objects.requireNonNull(pipelineConfig.extractor(), "extractor cannot be null");
 		this.transformer = Objects.requireNonNull(pipelineConfig.transformer(), "transformer cannot be null");
 		this.loader = Objects.requireNonNull(pipelineConfig.loader(), "loader cannot be null");
@@ -133,11 +137,31 @@ public abstract class BasePipeline implements Pipeline {
 	}
 
 	protected void loadViewableData() {
-		loader.loadViewableData(null, viewableCanonicalRecords);
+		Transaction transaction = new Transaction("Load Viewable Data");
+
+		StampEntity<?> activeStampEntity = transaction.getStamp(State.ACTIVE, loadConfig.time(),
+				loadConfig.authorPublicId(), loadConfig.modulePublicId(), loadConfig.pathPublicId());
+		StampEntity<?> inactiveStampEntity = transaction.getStamp(State.INACTIVE, loadConfig.time(),
+				loadConfig.authorPublicId(), loadConfig.modulePublicId(), loadConfig.pathPublicId());
+
+		Writer writer = new Writer(transaction, activeStampEntity, inactiveStampEntity);
+
+		loader.loadViewableData(writer, viewableCanonicalRecords);
+		transaction.commit();
 	}
 
 	protected void loadNavigableData() {
-		loader.loadNavigableData(null, navigableCanonicalRecords);
+		Transaction transaction = new Transaction("Load Navigable Data");
+
+		StampEntity<?> activeStampEntity = transaction.getStamp(State.ACTIVE, loadConfig.time(),
+				loadConfig.authorPublicId(), loadConfig.modulePublicId(), loadConfig.pathPublicId());
+		StampEntity<?> inactiveStampEntity = transaction.getStamp(State.INACTIVE, loadConfig.time(),
+				loadConfig.authorPublicId(), loadConfig.modulePublicId(), loadConfig.pathPublicId());
+
+		Writer writer = new Writer(transaction, activeStampEntity, inactiveStampEntity);
+
+		loader.loadNavigableData(writer, navigableCanonicalRecords);
+		transaction.commit();
 	}
 
 	@Override

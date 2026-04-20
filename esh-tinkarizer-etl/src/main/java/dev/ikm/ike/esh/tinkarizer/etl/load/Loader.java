@@ -7,8 +7,8 @@ import dev.ikm.ike.esh.tinkarizer.etl.domain.ViewableCanonicalRecord;
 
 public interface Loader {
 
-	void loadViewableData(LoadContext loadContext, List<ViewableCanonicalRecord> viewableCanonicalRecords);
+	void loadViewableData(Writer write, List<ViewableCanonicalRecord> viewableCanonicalRecords);
 
-	void loadNavigableData(LoadContext loadContext, List<NavigableCanonicalRecord> navigableCanonicalRecords);
+	void loadNavigableData(Writer write, List<NavigableCanonicalRecord> navigableCanonicalRecords);
 
 }

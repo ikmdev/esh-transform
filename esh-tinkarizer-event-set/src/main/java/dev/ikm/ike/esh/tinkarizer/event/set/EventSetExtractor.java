@@ -41,6 +41,32 @@ public class EventSetExtractor implements Extractor {
 	}
 
 	@Override
+	public List<NavigableSourceRecord> extractNavigableData() {
+		// Event Set Navigable Data
+		List<NavigableSourceRecord> esNavigableData = new ArrayList<>();
+		AtomicReference<String> parentNameReference = new AtomicReference<>();
+		eventSetSources.forEach(eventSetSource -> {
+			try (Reader esReader = new FileReader(eventSetSource); CSVParser esParser = csvFormat.parse(esReader)) {
+				for (CSVRecord csvRecord : esParser.getRecords()) {
+					if (!csvRecord.get("Event Set Name").isEmpty()) {
+						parentNameReference.set(csvRecord.get("Event Set Name"));
+						if (!csvRecord.get("Child Set Name").isEmpty()) {
+							esNavigableData.add(new NavigableSourceRecord("active", csvRecord.get("Child Set Name"),
+									parentNameReference.get()));
+						}
+					} else if (!csvRecord.get("Child Set Name").isEmpty()) {
+						esNavigableData.add(new NavigableSourceRecord("active", csvRecord.get("Child Set Name"),
+								parentNameReference.get()));
+					}
+				}
+			} catch (IOException ioException) {
+				throw new RuntimeException(ioException);
+			}
+		});
+		return esNavigableData;
+	}
+
+	@Override
 	public List<ViewableSourceRecord> extractViewableData() {
 		// Event Set Viewable Data
 		List<ViewableSourceRecord> esViewableData = new ArrayList<>();
@@ -58,32 +84,6 @@ public class EventSetExtractor implements Extractor {
 			}
 		});
 		return esViewableData;
-	}
-
-	@Override
-	public List<NavigableSourceRecord> getExtractedNavigableData() {
-		// Event Set Navigable Data
-		List<NavigableSourceRecord> esNavigableData = new ArrayList<>();
-		AtomicReference<String> parentNameReference = new AtomicReference<>();
-		eventSetSources.forEach(eventSetSource -> {
-			try (Reader esReader = new FileReader(eventSetSource); CSVParser esParser = csvFormat.parse(esReader)) {
-				for (CSVRecord csvRecord : esParser.getRecords()) {
-					if (!csvRecord.get("Event Set Name").isEmpty()) {
-						parentNameReference.set(csvRecord.get("Event Set Name"));
-						if (!csvRecord.get("Child Set Name").isEmpty()) {
-							esNavigableData.add(new NavigableSourceRecord("active", csvRecord.get("Child Set Name"),
-									parentNameReference.get()));
-						}
-					} else if (!csvRecord.get("Child Set Name").isEmpty()) {
-						esNavigableData.add(
-								new NavigableSourceRecord("active", csvRecord.get("Child Set Name"), parentNameReference.get()));
-					}
-				}
-			} catch (IOException ioException) {
-				throw new RuntimeException(ioException);
-			}
-		});
-		return esNavigableData;
 	}
 
 }
