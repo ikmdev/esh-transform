@@ -14,7 +14,7 @@ import dev.ikm.ike.esh.tinkarizer.etl.domain.NavigableSourceRecord;
 import dev.ikm.ike.esh.tinkarizer.etl.domain.ViewableCanonicalRecord;
 import dev.ikm.ike.esh.tinkarizer.etl.domain.ViewableSourceRecord;
 import dev.ikm.ike.esh.tinkarizer.etl.index.EntityIndex;
-import dev.ikm.ike.esh.tinkarizer.etl.transformer.Transformer;
+import dev.ikm.ike.esh.tinkarizer.etl.transform.Transformer;
 import dev.ikm.ike.esh.tinkarizer.starter.data.ESHStarterData;
 
 public class EventCodeTransformer implements Transformer {
@@ -30,7 +30,7 @@ public class EventCodeTransformer implements Transformer {
 	@Override
 	public List<ViewableCanonicalRecord> transformViewables(List<ViewableSourceRecord> viewableExtracts) {
 		List<ViewableCanonicalRecord> viewableCanonicalRecords = new ArrayList<>();
-		for (ViewableSourceRecord viewableExtract : viewableExtracts) {
+		viewableExtracts.forEach(viewableExtract -> {
 			UUID conceptId = Id.generateId(ESHStarterData.EVENT_CODE_NAMESPACE, viewableExtract.identifier());
 			boolean isActive = viewableExtract.status().equalsIgnoreCase("active");
 			ViewableCanonicalRecord viewableCanonicalRecord = new ViewableCanonicalRecord(
@@ -38,14 +38,13 @@ public class EventCodeTransformer implements Transformer {
 					viewableExtract.syn(), viewableExtract.def(), viewableExtract.identifier(),
 					ESHStarterData.EVENT_CODE_IDENTIFIER_UUID);
 			viewableCanonicalRecords.add(viewableCanonicalRecord);
-		}
+		});
 		return viewableCanonicalRecords;
 	}
 
 	@Override
 	public List<NavigableCanonicalRecord> transformNavigables(List<NavigableSourceRecord> navigableExtracts) {
-		List<NavigableCanonicalRecord> navigableCanonicalRecords = new ArrayList<>();
-		Map<UUID, List<UUID>> esIsA = new HashMap<>();
+		Map<UUID, NavigableCanonicalRecord> navigableRecordMap = new HashMap<>();
 
 		for (NavigableSourceRecord navigableExtract : navigableExtracts) {
 			if (!entityIndex.exists(ESHStarterData.EVENT_SET_NAMESPACE, navigableExtract.parentId())) {
@@ -54,23 +53,18 @@ public class EventCodeTransformer implements Transformer {
 			}
 			UUID childId = Id.generateId(ESHStarterData.EVENT_CODE_NAMESPACE, navigableExtract.childId());
 			UUID parentId = Id.generateId(ESHStarterData.EVENT_CODE_NAMESPACE, navigableExtract.parentId());
-			if (!esIsA.containsKey(childId)) {
-				List<UUID> parents = new ArrayList<>();
-				parents.add(parentId);
-				esIsA.put(childId, parents);
+			if (navigableRecordMap.containsKey(childId)) {
+				NavigableCanonicalRecord existingRecord = navigableRecordMap.get(childId);
+				existingRecord = existingRecord.with(parentId);
+				navigableRecordMap.put(childId, existingRecord);
 			} else {
-				esIsA.get(childId).add(parentId);
+				NavigableCanonicalRecord navigableCanonicalRecord = new NavigableCanonicalRecord(
+						ESHStarterData.EVENT_CODE_NAMESPACE, navigableExtract.status().equalsIgnoreCase("active"), childId, List.of(parentId));
+				navigableRecordMap.put(childId, navigableCanonicalRecord);
 			}
 		}
 
-		//Build NavigableCanonicalRecords
-		esIsA.forEach((childId, parentIds) -> {
-			NavigableCanonicalRecord navigableCanonicalRecord = new NavigableCanonicalRecord(
-					ESHStarterData.EVENT_CODE_NAMESPACE, childId, parentIds);
-			navigableCanonicalRecords.add(navigableCanonicalRecord);
-		});
-
-		return navigableCanonicalRecords;
+		return new ArrayList<>(navigableRecordMap.values());
 	}
 
 }

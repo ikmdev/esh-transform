@@ -59,7 +59,6 @@
 		<tinkar-core.groupId>dev.ikm.tinkar</tinkar-core.groupId>
 		<tinkar-core.version>1.125.0</tinkar-core.version>
 		<tinkar-starter-data.version>20250729</tinkar-starter-data.version>
-		<tinkar-composer.version>1.12.0</tinkar-composer.version>
 
 		<!-- JPMS Properties -->
 		<tinkar-jpms-deps.groupId>dev.ikm.jpms</tinkar-jpms-deps.groupId>
@@ -79,16 +78,27 @@
 	<dependencyManagement>
 		<dependencies>
 			<!-- ESH Libraries -->
-			 <dependency>
+			<dependency>
 				<groupId>dev.ikm.ike.esh.tinkarizer</groupId>
 				<artifactId>esh-tinkarizer-etl</artifactId>
 				<version>${project.version}</version>
-			 </dependency>
-			 <dependency>
+			</dependency>
+			<dependency>
+				<groupId>dev.ikm.ike.esh.tinkarizer</groupId>
+				<artifactId>esh-tinkarizer-event-code</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.ikm.ike.esh.tinkarizer</groupId>
+				<artifactId>esh-tinkarizer-event-set</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>dev.ikm.ike.esh.tinkarizer</groupId>
 				<artifactId>esh-starter-data</artifactId>
 				<version>${project.version}</version>
-			 </dependency>
+			</dependency>
+
 
 			<!-- Core Libraries -->
 			<dependency>
@@ -115,11 +125,6 @@
 				<groupId>${tinkar-core.groupId}</groupId>
 				<artifactId>terms</artifactId>
 				<version>${tinkar-core.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>dev.ikm.tinkar</groupId>
-				<artifactId>composer</artifactId>
-				<version>${tinkar-composer.version}</version>
 			</dependency>
 
 			<!-- JPMS Libraries -->

@@ -18,6 +18,10 @@
 			<groupId>dev.ikm.ike.esh.tinkarizer</groupId>
 			<artifactId>esh-tinkarizer-etl</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>dev.ikm.ike.esh.tinkarizer</groupId>
+			<artifactId>esh-starter-data</artifactId>
+		</dependency>
 
 		<!-- Misc. -->
 		<dependency>

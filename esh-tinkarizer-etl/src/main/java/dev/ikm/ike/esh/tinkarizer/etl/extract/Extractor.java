@@ -1,4 +1,4 @@
-package dev.ikm.ike.esh.tinkarizer.etl.extractor;
+package dev.ikm.ike.esh.tinkarizer.etl.extract;
 
 import java.io.File;
 import java.util.List;
@@ -12,7 +12,8 @@ public interface Extractor {
 
 	void addFilesToExtract(List<File> files);
 
-	List<ViewableSourceRecord> getExtractedViewableData();
+	List<ViewableSourceRecord> extractViewableData();
 
-	List<NavigableSourceRecord> getExtractedNavigableData();
+	List<NavigableSourceRecord> extractNavigableData();
+
 }

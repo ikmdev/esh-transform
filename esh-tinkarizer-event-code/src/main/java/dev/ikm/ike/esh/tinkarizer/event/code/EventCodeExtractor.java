@@ -13,7 +13,7 @@ import org.apache.commons.csv.CSVRecord;
 
 import dev.ikm.ike.esh.tinkarizer.etl.domain.NavigableSourceRecord;
 import dev.ikm.ike.esh.tinkarizer.etl.domain.ViewableSourceRecord;
-import dev.ikm.ike.esh.tinkarizer.etl.extractor.Extractor;
+import dev.ikm.ike.esh.tinkarizer.etl.extract.Extractor;
 import dev.ikm.ike.esh.tinkarizer.etl.index.EntityIndex;
 import dev.ikm.ike.esh.tinkarizer.starter.data.ESHStarterData;
 
@@ -40,7 +40,7 @@ public class EventCodeExtractor implements Extractor {
 	}
 
 	@Override
-	public List<ViewableSourceRecord> getExtractedViewableData() {
+	public List<ViewableSourceRecord> extractViewableData() {
 		// Event Code Viewable Data
 		List<ViewableSourceRecord> ecViewableData = new ArrayList<>();
 		eventCodeSources.forEach(eventCodeSource -> {
@@ -68,7 +68,7 @@ public class EventCodeExtractor implements Extractor {
 			try (Reader ecReader = new FileReader(eventCodeSource); CSVParser ecParser = csvFormat.parse(ecReader)) {
 				for (CSVRecord csvRecord : ecParser.getRecords()) {
 					if (!csvRecord.get("Prev Display").isEmpty()) {
-						NavigableSourceRecord navigableSourceRecord = new NavigableSourceRecord(
+						NavigableSourceRecord navigableSourceRecord = new NavigableSourceRecord("active",
 								csvRecord.get("Code Value"), csvRecord.get("Event Set Name"));
 						ecNavigableData.add(navigableSourceRecord);
 					}

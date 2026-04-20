@@ -1,4 +1,4 @@
-package dev.ikm.ike.esh.tinkarizer.etl.transformer;
+package dev.ikm.ike.esh.tinkarizer.etl.transform;
 
 import java.util.List;
 
@@ -9,8 +9,8 @@ import dev.ikm.ike.esh.tinkarizer.etl.domain.ViewableSourceRecord;
 
 public interface Transformer {
 
-	List<ViewableCanonicalRecord> transformViewables(List<ViewableSourceRecord> extracts);
+	List<ViewableCanonicalRecord> transformViewables(List<ViewableSourceRecord> viewableSourceRecord);
 
-	List<NavigableCanonicalRecord> transformNavigables(List<NavigableSourceRecord> extracts);
+	List<NavigableCanonicalRecord> transformNavigables(List<NavigableSourceRecord> navigableSourceRecord);
 
 }

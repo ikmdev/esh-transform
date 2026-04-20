@@ -16,10 +16,6 @@
         <!-- IKE Libraries -->
         <dependency>
             <groupId>${tinkar-core.groupId}</groupId>
-            <artifactId>data-spinedarray-provider</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${tinkar-core.groupId}</groupId>
             <artifactId>entity-provider</artifactId>
         </dependency>
         <dependency>
@@ -29,10 +25,6 @@
         <dependency>
             <groupId>${tinkar-core.groupId}</groupId>
             <artifactId>search-provider</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>dev.ikm.tinkar</groupId>
-            <artifactId>composer</artifactId>
         </dependency>
 
         <!-- IKM JPMS Libraries -->

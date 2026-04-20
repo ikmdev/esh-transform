@@ -1,4 +1,4 @@
-package dev.ikm.ike.esh.tinkarizer.etl;
+package dev.ikm.ike.esh.tinkarizer.cli;
 
 import java.io.File;
 
